@@ -1,6 +1,12 @@
+using Microsoft.EntityFrameworkCore;
 using minimals_api.Domain.DTOs;
+using minimals_api.Infrastructure.Db;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Adiciona a configuração para a conexão da DBContext (no caso aqui MinimalsContext) com o Banco de Dados
+builder.Services.AddDbContext<MinimalsContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("connectionSqlServer")));
+
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
