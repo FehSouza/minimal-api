@@ -21,5 +21,6 @@ namespace minimals_api.Infrastructure.Db
 		}
 
 		public DbSet<Administrator> Administrators { get; set; }
+		public DbSet<Vehicle> Vehicles { get; set; }
 	}
 }

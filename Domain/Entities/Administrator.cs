@@ -10,9 +10,11 @@ namespace minimals_api.Domain.Entities
 		[StringLength(255)]
 		public string Email { get; set; } = default!;
 
+		[Required]
 		[StringLength(50)]
 		public string Password { get; set; } = default!;
 
+		[Required]
 		[StringLength(10)]
 		public string Profile { get; set; } = default!;
 	}
