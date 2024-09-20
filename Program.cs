@@ -9,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 
+// Configuração do Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 // Adiciona a configuração para a conexão da DBContext (no caso aqui MinimalsContext) com o Banco de Dados
 builder.Services.AddDbContext<MinimalsContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("connectionSqlServer")));
 
@@ -21,5 +25,9 @@ app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdministratorService admin
   if (administratorService.Login(loginDTO) != null) return Results.Ok("Usuário logado com sucesso!");
   return Results.Unauthorized();
 });
+
+// Configuração do Swagger
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.Run();
