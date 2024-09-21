@@ -4,13 +4,13 @@ namespace minimals_api.Domain.Interfaces
 {
 	public interface IVehicleService
 	{
-		List<Vehicle> GetVehicle(int page = 1);
+		List<Vehicle> GetVehicle(int? page);
 
 		Vehicle? GetVehicleId(int id);
 
-		List<Vehicle> GetVehicleName(int page = 1, string? name = null);
+		List<Vehicle> GetVehicleName(int? page, string? name = null);
 
-		List<Vehicle> GetVehicleBrand(int page = 1, string? brand = null);
+		List<Vehicle> GetVehicleBrand(int? page, string? brand = null);
 
 		void PostVehicle(Vehicle vehicle);
 

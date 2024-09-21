@@ -12,10 +12,13 @@ namespace minimals_api.Domain.Services
 
 		private readonly int itemsPerPage = 10;
 
-		public List<Vehicle> GetVehicle(int page = 1)
+		public List<Vehicle> GetVehicle(int? page)
 		{
 			var vehicles = _context.Vehicles.AsQueryable();
-			vehicles = vehicles.Skip((page - 1) * itemsPerPage).Take(itemsPerPage);
+
+			var pageConvert = page == null ? 1 : Convert.ToInt32(page);
+			vehicles = vehicles.Skip((pageConvert - 1) * itemsPerPage).Take(itemsPerPage);
+
 			return [.. vehicles];
 		}
 
@@ -25,19 +28,25 @@ namespace minimals_api.Domain.Services
 			return vehicle.FirstOrDefault();
 		}
 
-		public List<Vehicle> GetVehicleName(int page, string? name)
+		public List<Vehicle> GetVehicleName(int? page, string? name)
 		{
 			if (string.IsNullOrEmpty(name)) return [];
 			var vehicles = _context.Vehicles.Where(v => v.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase)).AsQueryable();
-			vehicles = vehicles.Skip((page - 1) * itemsPerPage).Take(itemsPerPage);
+
+			var pageConvert = page == null ? 1 : Convert.ToInt32(page);
+			vehicles = vehicles.Skip((pageConvert - 1) * itemsPerPage).Take(itemsPerPage);
+
 			return [.. vehicles];
 		}
 
-		public List<Vehicle> GetVehicleBrand(int page, string? brand)
+		public List<Vehicle> GetVehicleBrand(int? page, string? brand)
 		{
 			if (string.IsNullOrEmpty(brand)) return [];
 			var vehicles = _context.Vehicles.Where(v => v.Brand.Contains(brand, StringComparison.CurrentCultureIgnoreCase)).AsQueryable();
-			vehicles = vehicles.Skip((page - 1) * itemsPerPage).Take(itemsPerPage);
+
+			var pageConvert = page == null ? 1 : Convert.ToInt32(page);
+			vehicles = vehicles.Skip((pageConvert - 1) * itemsPerPage).Take(itemsPerPage);
+
 			return [.. vehicles];
 		}
 
