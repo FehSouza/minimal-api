@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using minimals_api.Domain.DTOs;
 using minimals_api.Domain.Interfaces;
+using minimals_api.Domain.ModelViews;
 using minimals_api.Domain.Services;
 using minimals_api.Infrastructure.Db;
 
@@ -18,7 +19,8 @@ builder.Services.AddDbContext<MinimalsContext>(options => options.UseSqlServer(b
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+// Instância da ModelView da Home
+app.MapGet("/", () => Results.Json(new Home()));
 
 app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdministratorService administratorService) =>
 {
