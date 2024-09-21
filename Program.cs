@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using minimals_api.Domain.DTOs;
 using minimals_api.Domain.Entities;
 using minimals_api.Domain.Interfaces;
@@ -37,8 +38,23 @@ app.MapPost("/administrators/login", ([FromBody] LoginDTO loginDTO, IAdministrat
 #endregion
 
 #region Vehicles
+static ErrorVehicle ErrorVehicleValidation(VehicleDTO vehicleDTO)
+{
+  var error = new ErrorVehicle { Messages = [] };
+
+  if (vehicleDTO.Name.IsNullOrEmpty()) error.Messages.Add("O nome não pode ser um dado vazio.");
+  if (vehicleDTO.Brand.IsNullOrEmpty()) error.Messages.Add("A marca não pode ser um dado vazio.");
+  if (vehicleDTO.Year < 1950) error.Messages.Add("Veículo muito antigo. A ano deve ser igual ou superior a 1950.");
+
+  return error;
+};
+
+
 app.MapPost("/vehicles", ([FromBody] VehicleDTO vehicleDTO, IVehicleService vehicleService) =>
 {
+  var validation = ErrorVehicleValidation(vehicleDTO);
+  if (validation.Messages.Count > 0) return Results.BadRequest(validation);
+
   var vehicle = new Vehicle
   {
     Name = vehicleDTO.Name,
@@ -79,6 +95,9 @@ app.MapPut("/vehicle/{id}", ([FromRoute] int id, VehicleDTO vehicleDTO, IVehicle
 {
   var vehicle = vehicleService.GetVehicleId(id);
   if (vehicle == null) return Results.NotFound();
+
+  var validation = ErrorVehicleValidation(vehicleDTO);
+  if (validation.Messages.Count > 0) return Results.BadRequest(validation);
 
   vehicle.Name = vehicleDTO.Name;
   vehicle.Brand = vehicleDTO.Brand;
