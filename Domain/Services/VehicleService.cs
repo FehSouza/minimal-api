@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using minimals_api.Domain.Entities;
 using minimals_api.Domain.Interfaces;
 using minimals_api.Infrastructure.Db;
@@ -31,7 +29,7 @@ namespace minimals_api.Domain.Services
 		public List<Vehicle> GetVehicleName(int? page, string? name)
 		{
 			if (string.IsNullOrEmpty(name)) return [];
-			var vehicles = _context.Vehicles.Where(v => v.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase)).AsQueryable();
+			var vehicles = _context.Vehicles.Where(v => v.Name.Contains(name)).AsQueryable();
 
 			var pageConvert = page == null ? 1 : Convert.ToInt32(page);
 			vehicles = vehicles.Skip((pageConvert - 1) * itemsPerPage).Take(itemsPerPage);
@@ -42,7 +40,7 @@ namespace minimals_api.Domain.Services
 		public List<Vehicle> GetVehicleBrand(int? page, string? brand)
 		{
 			if (string.IsNullOrEmpty(brand)) return [];
-			var vehicles = _context.Vehicles.Where(v => v.Brand.Contains(brand, StringComparison.CurrentCultureIgnoreCase)).AsQueryable();
+			var vehicles = _context.Vehicles.Where(v => v.Brand.Contains(brand)).AsQueryable();
 
 			var pageConvert = page == null ? 1 : Convert.ToInt32(page);
 			vehicles = vehicles.Skip((pageConvert - 1) * itemsPerPage).Take(itemsPerPage);
@@ -62,27 +60,10 @@ namespace minimals_api.Domain.Services
 			_context.SaveChanges();
 		}
 
-		public void UpdateVehicleId(int id, Vehicle vehicle)
-		{
-			var vehicleFind = _context.Vehicles.Find(id);
-			if (vehicleFind == null) return;
-			_context.Vehicles.Update(vehicle);
-			_context.SaveChanges();
-		}
-
 		public void DeleteVehicle(Vehicle vehicle)
 		{
 			_context.Vehicles.Remove(vehicle);
 			_context.SaveChanges();
-		}
-
-		public void DeleteVehicleId(int id)
-		{
-			var vehicle = _context.Vehicles.Find(id);
-			if (vehicle == null) return;
-			_context.Vehicles.Remove(vehicle);
-			_context.SaveChanges();
-
 		}
 	}
 }

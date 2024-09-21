@@ -55,6 +55,47 @@ app.MapGet("/vehicles", ([FromQuery] int? page, IVehicleService vehicleService) 
   var vehicles = vehicleService.GetVehicle(page);
   return Results.Ok(vehicles);
 }).WithTags("Vehicles");
+
+app.MapGet("/vehicle/{id}", ([FromRoute] int id, IVehicleService vehicleService) =>
+{
+  var vehicle = vehicleService.GetVehicleId(id);
+  if (vehicle == null) return Results.NotFound();
+  return Results.Ok(vehicle);
+}).WithTags("Vehicles");
+
+app.MapGet("/vehiclesName/{name}", ([FromRoute] string name, int? page, IVehicleService vehicleService) =>
+{
+  var vehicles = vehicleService.GetVehicleName(page, name);
+  return Results.Ok(vehicles);
+}).WithTags("Vehicles");
+
+app.MapGet("/vehiclesBrand/{brand}", ([FromRoute] string brand, int? page, IVehicleService vehicleService) =>
+{
+  var vehicles = vehicleService.GetVehicleBrand(page, brand);
+  return Results.Ok(vehicles);
+}).WithTags("Vehicles");
+
+app.MapPut("/vehicle/{id}", ([FromRoute] int id, VehicleDTO vehicleDTO, IVehicleService vehicleService) =>
+{
+  var vehicle = vehicleService.GetVehicleId(id);
+  if (vehicle == null) return Results.NotFound();
+
+  vehicle.Name = vehicleDTO.Name;
+  vehicle.Brand = vehicleDTO.Brand;
+  vehicle.Year = vehicleDTO.Year;
+
+  vehicleService.UpdateVehicle(vehicle);
+  return Results.Ok(vehicle);
+}).WithTags("Vehicles");
+
+app.MapDelete("/vehicle/{id}", ([FromRoute] int id, IVehicleService vehicleService) =>
+{
+  var vehicle = vehicleService.GetVehicleId(id);
+  if (vehicle == null) return Results.NotFound();
+
+  vehicleService.DeleteVehicle(vehicle);
+  return Results.NoContent();
+}).WithTags("Vehicles");
 #endregion
 
 #region App

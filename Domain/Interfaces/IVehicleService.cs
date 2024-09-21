@@ -16,10 +16,6 @@ namespace minimals_api.Domain.Interfaces
 
 		void UpdateVehicle(Vehicle vehicle);
 
-		void UpdateVehicleId(int id, Vehicle vehicle);
-
 		void DeleteVehicle(Vehicle vehicle);
-
-		void DeleteVehicleId(int id);
 	}
 }
