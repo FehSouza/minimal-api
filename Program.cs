@@ -30,10 +30,84 @@ app.MapGet("/", () => Results.Json(new Home())).WithTags("Home");
 #endregion
 
 #region Administrators
+static ErrorAdministrator ErrorAdministratorValidation(AdministratorDTO administratorDTO)
+{
+  var error = new ErrorAdministrator { Messages = [] };
+
+  if (administratorDTO.Email.IsNullOrEmpty()) error.Messages.Add("O e-mail não pode ser um dado vazio.");
+  if (!administratorDTO.Email.Contains('@')) error.Messages.Add("Digite um e-mail válido.");
+  if (administratorDTO.Password.IsNullOrEmpty()) error.Messages.Add("A senha não pode ser um dado vazio.");
+  if (administratorDTO.Profile.ToString() != "Admin" && administratorDTO.Profile.ToString() != "Editor")
+    error.Messages.Add("O perfil não pode ser um dado vazio. Escolha entre Admin (0) ou Editor (1)");
+
+  return error;
+}
+
 app.MapPost("/administrators/login", ([FromBody] LoginDTO loginDTO, IAdministratorService administratorService) =>
 {
   if (administratorService.Login(loginDTO) != null) return Results.Ok("Usuário logado com sucesso!");
   return Results.Unauthorized();
+}).WithTags("Administrators");
+
+app.MapPost("/administrators", ([FromBody] AdministratorDTO administratorDTO, IAdministratorService administratorService) =>
+{
+  var validation = ErrorAdministratorValidation(administratorDTO);
+  if (validation.Messages.Count > 0) return Results.BadRequest(validation);
+
+  var administrator = new Administrator
+  {
+    Email = administratorDTO.Email,
+    Password = administratorDTO.Password,
+    Profile = administratorDTO.Profile.ToString()
+  };
+
+  administratorService.PostAdministrator(administrator);
+
+  var administratorMV = new AdministratorMV
+  {
+    Id = administrator.Id,
+    Email = administrator.Email,
+    Profile = administrator.Profile,
+  };
+
+  return Results.Created($"/administrator/{administrator.Id}", administratorMV);
+}).WithTags("Administrators");
+
+app.MapGet("/administrators", ([FromQuery] int? page, IAdministratorService administratorService) =>
+{
+  var administrators = administratorService.GetAdministrators(page);
+  var administratorsMV = new List<AdministratorMV>();
+
+  foreach (var adm in administrators)
+  {
+    administratorsMV.Add(new AdministratorMV { Id = adm.Id, Email = adm.Email, Profile = adm.Profile });
+  }
+
+  return Results.Ok(administratorsMV);
+}).WithTags("Administrators");
+
+app.MapGet("/administrator/{id}", ([FromRoute] int id, IAdministratorService administratorService) =>
+{
+  var administrator = administratorService.GetAdministratorId(id);
+  if (administrator == null) return Results.NotFound();
+
+  var administratorMV = new AdministratorMV
+  {
+    Id = administrator.Id,
+    Email = administrator.Email,
+    Profile = administrator.Profile,
+  };
+
+  return Results.Ok(administratorMV);
+}).WithTags("Administrators");
+
+app.MapDelete("/administrator/{id}", ([FromRoute] int id, IAdministratorService administratorService) =>
+{
+  var administrator = administratorService.GetAdministratorId(id);
+  if (administrator == null) return Results.NotFound();
+
+  administratorService.DeleteAdministrator(administrator);
+  return Results.NoContent();
 }).WithTags("Administrators");
 #endregion
 
@@ -48,7 +122,6 @@ static ErrorVehicle ErrorVehicleValidation(VehicleDTO vehicleDTO)
 
   return error;
 };
-
 
 app.MapPost("/vehicles", ([FromBody] VehicleDTO vehicleDTO, IVehicleService vehicleService) =>
 {
